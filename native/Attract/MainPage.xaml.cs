@@ -195,9 +195,16 @@ namespace Attract
             PostMessage(Message("input-owner", "active", false));
         }
 
-        public void ReturnedFromGame()
+        public async void ReturnedFromGame(Uri uri)
         {
             gamepad.RequireNeutral();
+            if (GameLauncher.IsContinue(uri))
+            {
+                // RetroArch closed to make room for the game the player picked.
+                if (!await GameLauncher.ContinuePendingAsync()) PostMessage(Message("launch-failed"));
+                return;
+            }
+            GameLauncher.MarkReturned();
             PostMessage(Message("returned"));
         }
 

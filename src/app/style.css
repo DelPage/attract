@@ -45,10 +45,11 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .backdrop { position: absolute; inset: 0; overflow: hidden; }
 .backdrop-art {
   position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
-  image-rendering: pixelated; opacity: 0; transform: scale(1.04);
+  image-rendering: pixelated; opacity: 0; transform: scale(1.1);
   transition: opacity 900ms var(--ease), transform 7s linear;
 }
-.backdrop-art.is-on { opacity: 1; transform: scale(1); }
+/* Slight overscale hides the black borders many console screenshots carry. */
+.backdrop-art.is-on { opacity: 1; transform: scale(1.06); }
 .backdrop-shade {
   position: absolute; inset: 0;
   background:

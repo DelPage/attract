@@ -33,7 +33,7 @@ namespace Attract
             Window.Current.Activate();
             if (args.Kind == ActivationKind.Protocol)
             {
-                page?.ReturnedFromGame();
+                page?.ReturnedFromGame(((ProtocolActivatedEventArgs)args).Uri);
             }
         }
 
