@@ -1,0 +1,66 @@
+/* ---------- Home: stacked channels with a receding row of cards (Xbox 360, 2008) ---------- */
+
+.home.nxe { padding-bottom: 0; }
+
+/* Channel names: earlier channels fade above the current one, later ones wait below the cards. */
+.nxe-channels { position: absolute; left: var(--safe-x); top: 7.5rem; display: flex; flex-direction: column; gap: 0.25rem; }
+.nxe-channel { font-size: 1.75rem; font-weight: 500; color: rgb(230 224 233 / 0.45); letter-spacing: 0.01em; }
+.nxe-channel.is-current { font-size: 3.5rem; font-weight: 700; color: var(--on-surface); letter-spacing: -0.01em; text-shadow: 0 2px 20px rgb(0 0 0 / 0.5); }
+.nxe-channels-below { position: absolute; left: var(--safe-x); top: 55rem; display: flex; flex-direction: column; gap: 0.25rem; }
+
+.nxe-deck {
+  position: absolute; left: var(--safe-x); right: 0; top: 17rem; height: 30rem;
+  perspective: 2600px; perspective-origin: 10% 50%;
+}
+.nxe-deck.slide-up { animation: nxe-in-up 380ms var(--ease); }
+.nxe-deck.slide-down { animation: nxe-in-down 380ms var(--ease); }
+@keyframes nxe-in-up { from { opacity: 0; translate: 0 5rem; } }
+@keyframes nxe-in-down { from { opacity: 0; translate: 0 -5rem; } }
+
+/* The slot is what moves along the row; it holds the card and its reflection. */
+.nxe-slot {
+  position: absolute; left: 0; top: 0; height: 30rem; aspect-ratio: var(--aspect); transform-origin: 0 0;
+  transition: transform 420ms var(--ease), opacity 420ms var(--ease);
+}
+.nxe-card {
+  position: absolute; inset: 0; border-radius: 1.25rem; overflow: hidden; background: #fff;
+  box-shadow: 0 1.5rem 3.5rem rgb(0 0 0 / 0.55), inset 0 0 0 1px rgb(255 255 255 / 0.25);
+  transition: box-shadow 300ms var(--ease);
+}
+.nxe-slot.is-game .nxe-card { background: var(--surface-container); }
+
+/* Floor reflection: the picture flipped, fading out quickly. */
+.nxe-mirror {
+  position: absolute; left: 0; right: 0; top: calc(100% + 0.9rem); height: 40%; overflow: hidden; border-radius: 1.25rem 1.25rem 0 0;
+  opacity: 0.16; pointer-events: none;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, transparent 85%); mask-image: linear-gradient(180deg, #000 0%, transparent 85%);
+}
+.nxe-mirror-art { position: absolute; left: 0; bottom: 0; width: 100%; height: 250%; object-fit: cover; transform: scaleY(-1); }
+.nxe-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.nxe-card-empty { position: absolute; inset: 0; display: grid; place-items: center; padding: 2rem; font-size: 2rem; font-weight: 700; text-align: center;
+  background: linear-gradient(160deg, var(--surface-container-highest), var(--surface-container)); }
+
+/* Glass sheen across the top of every card, like the 2008 dashboard's glossy panels. */
+.nxe-gloss {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    linear-gradient(172deg, rgb(255 255 255 / 0.42) 0%, rgb(255 255 255 / 0.12) 34%, rgb(255 255 255 / 0) 35%),
+    linear-gradient(0deg, rgb(0 0 0 / 0.08), rgb(0 0 0 / 0) 40%);
+}
+
+/* Name plate along the bottom of the card. */
+.nxe-band {
+  position: absolute; left: 0; right: 0; bottom: 0; padding: 1.1rem 1.5rem 1.2rem; display: flex; flex-direction: column; gap: 0.2rem; text-align: left;
+  background: linear-gradient(0deg, rgb(12 11 16 / 0.92), rgb(12 11 16 / 0.72) 70%, rgb(12 11 16 / 0));
+  transition: opacity 300ms var(--ease);
+}
+.nxe-slot.is-system .nxe-band { padding-top: 2.2rem; }
+.nxe-title { font-size: 2.25rem; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nxe-sub { font-size: 1.35rem; color: rgb(255 255 255 / 0.78); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nxe-slot.is-game .nxe-title { font-size: 1.6rem; }
+.nxe-slot.is-game .nxe-sub { font-size: 1.1rem; }
+
+/* Cards further back keep only their picture; the name returns when they come forward. */
+.nxe-slot.is-behind .nxe-band { opacity: 0; }
+.nxe-slot.is-behind .nxe-card { box-shadow: 0 1rem 2.5rem rgb(0 0 0 / 0.5); }
+.nxe-slot.is-focused .nxe-card { box-shadow: 0 0 0 0.3rem var(--focus), 0 2rem 4.5rem rgb(0 0 0 / 0.65); }

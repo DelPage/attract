@@ -45,11 +45,11 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .backdrop { position: absolute; inset: 0; overflow: hidden; }
 .backdrop-art {
   position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
-  image-rendering: pixelated; opacity: 0; transform: scale(1.1);
+  opacity: 0; transform: scale(1.15); filter: blur(28px) saturate(1.35);
   transition: opacity 900ms var(--ease), transform 7s linear;
 }
 /* Slight overscale hides the black borders many console screenshots carry. */
-.backdrop-art.is-on { opacity: 1; transform: scale(1.06); }
+.backdrop-art.is-on { opacity: 1; transform: scale(1.1); }
 .backdrop-shade {
   position: absolute; inset: 0;
   background:
@@ -79,46 +79,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 /* ---------- Home ---------- */
 .topbar { display: flex; align-items: center; height: 3rem; }
 .wordmark { font-size: 2rem; font-weight: 700; letter-spacing: 0.02em; }
-.home-info { flex: 1; min-height: 9rem; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 2rem; max-width: 90rem; }
-/* With a second row the hero text gets less room; keep it clear of the top bar. */
-.home:has(.shelf-recent) .home-title { font-size: 3.75rem; }
-.home-title { margin: 0; font-size: 4.5rem; line-height: 1.1; font-weight: 700; letter-spacing: -0.01em; text-shadow: 0 2px 24px rgb(0 0 0 / 0.5);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.home-detail { margin: 1rem 0 0; font-size: 1.875rem; color: var(--on-surface-variant); }
-
-.shelf { margin-top: 0.5rem; }
-.shelf-label { margin: 0 0 0.5rem; font-size: 1.625rem; font-weight: 500; color: var(--on-surface-variant); }
-.shelf:not(.is-active) .shelf-label { opacity: 0.7; }
-.shelf-track { display: flex; gap: 1.75rem; overflow: hidden; padding: 1.25rem var(--safe-x) 1.5rem 0.75rem; margin: -0.5rem calc(-1 * var(--safe-x)) 0 -0.75rem; scroll-behavior: smooth; }
-.shelf-recent .shelf-track { gap: 1.5rem; }
-
-.system-card { flex: 0 0 20rem; display: flex; flex-direction: column; align-items: flex-start; text-align: left; transition: transform 200ms var(--ease); }
-.fan {
-  position: relative; width: 18rem; height: 15rem; border-radius: var(--radius-l); overflow: hidden;
-  background: linear-gradient(160deg, var(--surface-container-high), var(--surface-container));
-  transition: box-shadow 200ms var(--ease);
-}
-.fan-cover { position: absolute; bottom: -0.5rem; width: 8.25rem; height: 11rem; object-fit: cover; border-radius: var(--radius-s); box-shadow: 0 10px 30px rgb(0 0 0 / 0.55); }
-.fan-0 { left: 1rem; transform: rotate(-7deg); z-index: 1; }
-.fan-1 { left: 4.9rem; bottom: 0.4rem; z-index: 3; transform: rotate(0deg); }
-.fan-2 { left: 8.8rem; transform: rotate(7deg); z-index: 2; }
-.system-art { width: 20rem; aspect-ratio: 1.6; border-radius: var(--radius-l); overflow: hidden; background: #fff;
-  box-shadow: 0 12px 32px rgb(0 0 0 / 0.45); transition: box-shadow 200ms var(--ease); }
-.system-photo { display: block; width: 100%; height: 100%; object-fit: cover; }
-/* A dark gap keeps the white focus ring visible against the white photo. */
-.system-card.is-focused .system-art { box-shadow: 0 0 0 0.25rem var(--surface), 0 0 0 0.5rem var(--focus), 0 16px 40px rgb(0 0 0 / 0.6); }
-.system-name { margin-top: 1rem; font-size: 1.75rem; font-weight: 500; }
-.system-count { margin-top: 0.25rem; font-size: 1.375rem; color: var(--on-surface-variant); }
-.system-card.is-focused { transform: scale(1.06); transform-origin: 50% 70%; }
-.system-card.is-focused .fan { box-shadow: 0 0 0 0.25rem var(--focus), 0 16px 40px rgb(0 0 0 / 0.6); }
-
-.recent-card { flex: 0 0 8.5rem; display: flex; flex-direction: column; text-align: left; transition: transform 200ms var(--ease); }
-.recent-cover { width: 8.5rem; height: 11rem; object-fit: cover; border-radius: var(--radius-s); background: var(--surface-container); }
-.recent-title { margin-top: 0.625rem; font-size: 1.125rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.recent-system { font-size: 1rem; color: var(--on-surface-variant); }
-.recent-card.is-focused { transform: scale(1.08); transform-origin: 50% 40%; }
-.recent-card.is-focused .recent-cover { box-shadow: 0 0 0 0.25rem var(--focus); }
-.shelf-recent:not(.is-active) { opacity: 0.8; }
+/* Home screen styles live in home.css. */
 
 /* ---------- Library ---------- */
 .library-head { display: flex; flex-direction: column; gap: 1.25rem; }

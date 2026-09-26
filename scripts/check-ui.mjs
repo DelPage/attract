@@ -39,7 +39,7 @@ async function session(width, height, name, steps) {
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
   await page.goto(url);
-  await page.waitForSelector('.system-card.is-focused');
+  await page.waitForSelector('.nxe-slot.is-focused');
   await steps(page, async (label) => { await wait(1100); await page.screenshot({ path: path.join(shots, `${name}-${label}.png`) }); });
   assert(!errors.length, `${name}: page errors ${errors.join('; ')}`);
   await page.close();
@@ -49,9 +49,9 @@ const press = async (page, key, times = 1) => { for (let i = 0; i < times; i++) 
 
 await session(1920, 1080, '1080p', async (page, shot) => {
   await shot('home');
-  results.systems = await page.$$eval('.system-card', (n) => n.map((x) => x.querySelector('.system-name').textContent));
+  results.systems = await page.$$eval('.nxe-slot.is-system', (n) => n.map((x) => x.querySelector('.nxe-title').textContent));
   await press(page, 'ArrowRight');
-  const home = await page.$eval('.home-title', (n) => n.textContent);
+  const home = await page.$eval('.nxe-slot.is-focused .nxe-title', (n) => n.textContent);
   results.homeSecond = home;
   await shot('home-snes');
   await press(page, 'Enter');
@@ -79,7 +79,10 @@ await session(1920, 1080, '1080p', async (page, shot) => {
   await shot('library-favorites');
   await press(page, 'Escape', 3);
   await page.waitForSelector('.home:not(.is-behind)');
-  results.recentRow = await page.$$eval('.recent-card', (n) => n.length);
+  results.channels = await page.$$eval('.nxe-channel', (n) => n.map((x) => x.textContent));
+  await press(page, 'ArrowDown');
+  await shot('home-recent-row');
+  await press(page, 'ArrowUp');
   await shot('home-with-recent');
   await press(page, 'y');
   await page.waitForSelector('.search-input');
