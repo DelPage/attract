@@ -7,6 +7,8 @@ export interface CatalogSystem {
   maker: string;
   year: number;
   gameCount: number;
+  /** Console photo for the home screen card, relative to the library. */
+  image?: string;
 }
 
 export interface CatalogVersion { label: string; path: string }

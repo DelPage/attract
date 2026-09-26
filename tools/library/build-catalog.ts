@@ -5,7 +5,7 @@
  *   npx tsx tools/library/build-catalog.ts
  */
 import { createHash } from 'node:crypto';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import type { Catalog, CatalogGame, CatalogSystem } from './catalog';
 import { matchKey, parseName, stripTags, versionScore } from './names';
@@ -113,7 +113,9 @@ async function main(): Promise<void> {
     if (!list.length) continue;
     games.push(...list);
     const shown = list.filter((g) => !g.extra);
-    systems.push({ id: system.id, name: system.name, shortName: system.shortName, maker: system.maker, year: system.year, gameCount: shown.length });
+    const image = `media/systems/${system.id}.webp`;
+    systems.push({ id: system.id, name: system.name, shortName: system.shortName, maker: system.maker, year: system.year, gameCount: shown.length,
+      ...(existsSync(path.join(OUT, image)) ? { image } : {}) });
     const pct = (n: number) => `${Math.round((100 * n) / Math.max(1, shown.length))}%`;
     console.log(`${system.shortName.padEnd(14)} ${String(shown.length).padStart(5)} games (+${list.length - shown.length} extras)  cover ${pct(shown.filter((g) => g.artSource.cover).length)}  screen ${pct(shown.filter((g) => g.artSource.screen).length)}  year ${pct(shown.filter((g) => g.year).length)}  genre ${pct(shown.filter((g) => g.genre).length)}  about ${pct(shown.filter((g) => g.description).length)}`);
   }

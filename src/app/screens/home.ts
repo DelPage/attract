@@ -63,11 +63,14 @@ export class HomeScreen implements Screen {
   }
 
   private systemCard(system: CatalogSystem): HTMLElement {
-    const games = this.library.bySystem.get(system.id) ?? [];
-    const covers = showcase(games, system.id, 3, 'cover');
-    const fan = h('div', { class: 'fan' }, ...covers.map((g, i) => img(mediaUrl(g.art.cover), `fan-cover fan-${i}`)));
+    // The console itself, edge to edge. Systems without a photo fall back to a fan of their covers.
+    const photo = img(mediaUrl(system.image), 'system-photo', system.name);
+    const art = photo
+      ? h('div', { class: 'system-art' }, photo)
+      : h('div', { class: 'fan' }, ...showcase(this.library.bySystem.get(system.id) ?? [], system.id, 3, 'cover')
+        .map((g, i) => img(mediaUrl(g.art.cover), `fan-cover fan-${i}`)));
     const card = h('button', { class: 'system-card', attrs: { 'data-system': system.id } },
-      fan,
+      art,
       h('span', { class: 'system-name', text: system.shortName }),
       h('span', { class: 'system-count', text: gameCount(system.gameCount) }));
     return card;

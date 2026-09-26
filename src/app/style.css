@@ -89,7 +89,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .shelf-track { display: flex; gap: 1.75rem; overflow: hidden; padding: 1.25rem var(--safe-x) 1.5rem 0.75rem; margin: -0.5rem calc(-1 * var(--safe-x)) 0 -0.75rem; scroll-behavior: smooth; }
 .shelf-recent .shelf-track { gap: 1.5rem; }
 
-.system-card { flex: 0 0 18rem; display: flex; flex-direction: column; align-items: flex-start; text-align: left; transition: transform 200ms var(--ease); }
+.system-card { flex: 0 0 20rem; display: flex; flex-direction: column; align-items: flex-start; text-align: left; transition: transform 200ms var(--ease); }
 .fan {
   position: relative; width: 18rem; height: 15rem; border-radius: var(--radius-l); overflow: hidden;
   background: linear-gradient(160deg, var(--surface-container-high), var(--surface-container));
@@ -99,6 +99,11 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .fan-0 { left: 1rem; transform: rotate(-7deg); z-index: 1; }
 .fan-1 { left: 4.9rem; bottom: 0.4rem; z-index: 3; transform: rotate(0deg); }
 .fan-2 { left: 8.8rem; transform: rotate(7deg); z-index: 2; }
+.system-art { width: 20rem; aspect-ratio: 1.6; border-radius: var(--radius-l); overflow: hidden; background: #fff;
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.45); transition: box-shadow 200ms var(--ease); }
+.system-photo { display: block; width: 100%; height: 100%; object-fit: cover; }
+/* A dark gap keeps the white focus ring visible against the white photo. */
+.system-card.is-focused .system-art { box-shadow: 0 0 0 0.25rem var(--surface), 0 0 0 0.5rem var(--focus), 0 16px 40px rgb(0 0 0 / 0.6); }
 .system-name { margin-top: 1rem; font-size: 1.75rem; font-weight: 500; }
 .system-count { margin-top: 0.25rem; font-size: 1.375rem; color: var(--on-surface-variant); }
 .system-card.is-focused { transform: scale(1.06); transform-origin: 50% 70%; }

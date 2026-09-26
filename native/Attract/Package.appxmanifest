@@ -6,7 +6,7 @@
   IgnorableNamespaces="uap mp">
   <Identity Name="DelPage.Attract"
             Publisher="CN=DelPage"
-            Version="0.1.1.0" />
+            Version="0.1.2.0" />
   <mp:PhoneIdentity PhoneProductId="c991f7de-497a-48a4-9bda-d8cbb0a6f5eb"
                     PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
