@@ -1,0 +1,63 @@
+name: Xbox package
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['src/**', 'public/**', 'native/**', 'scripts/build.mjs', 'package*.json', '.github/workflows/xbox-package.yml']
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: windows-2022
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Build interface
+        run: |
+          npm ci --no-audit --no-fund
+          npm test
+          npm run build
+
+      - uses: microsoft/setup-msbuild@v2
+
+      - name: Restore signing certificate
+        shell: pwsh
+        env:
+          PFX_BASE64: ${{ secrets.XBOX_SIGNING_PFX }}
+        run: |
+          if (-not $env:PFX_BASE64) { throw 'XBOX_SIGNING_PFX secret is missing.' }
+          [IO.File]::WriteAllBytes("$env:RUNNER_TEMP\signing.pfx", [Convert]::FromBase64String($env:PFX_BASE64))
+
+      - name: Build and sign x64 package
+        shell: pwsh
+        env:
+          PFX_PASSWORD: ${{ secrets.XBOX_SIGNING_PASSWORD }}
+        run: |
+          msbuild native/Attract.sln /t:Restore,Build /m /nologo `
+            /p:Configuration=Release /p:Platform=x64 `
+            /p:GenerateAppxPackageOnBuild=true /p:AppxBundle=Never /p:UapAppxPackageBuildMode=SideloadOnly `
+            /p:AppxPackageSigningEnabled=true "/p:PackageCertificateKeyFile=$env:RUNNER_TEMP\signing.pfx" `
+            "/p:PackageCertificatePassword=$env:PFX_PASSWORD" /p:AppxPackageDir="$env:GITHUB_WORKSPACE\packages\\"
+          if ($LASTEXITCODE -ne 0) { throw "MSBuild failed with exit code $LASTEXITCODE" }
+          Get-ChildItem packages -Recurse -File | Select-Object FullName, Length | Format-Table -AutoSize
+
+      - name: Remove signing certificate
+        if: always()
+        shell: pwsh
+        run: Remove-Item "$env:RUNNER_TEMP\signing.pfx" -ErrorAction SilentlyContinue
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: attract-xbox-x64
+          path: packages/**
+          if-no-files-found: error
+          retention-days: 14

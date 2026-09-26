@@ -1,0 +1,13 @@
+node_modules/
+dist/
+output/
+.env
+.private/
+media-cache/
+artifacts/
+**/bin/
+**/obj/
+**/AppPackages/
+*.pfx
+packages/
+*.cer
