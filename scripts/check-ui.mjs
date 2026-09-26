@@ -66,6 +66,8 @@ await session(1920, 1080, '1080p', async (page, shot) => {
   await page.waitForSelector('.detail .action.is-focused');
   results.detailTitle = await page.$eval('.detail-title', (n) => n.textContent);
   await shot('detail');
+  await press(page, 'Enter');
+  await wait(3000);
   await press(page, 'x');
   results.favorited = await page.$eval('.action-favorite', (n) => n.classList.contains('is-on'));
   await press(page, 'Escape');
@@ -77,6 +79,8 @@ await session(1920, 1080, '1080p', async (page, shot) => {
   await shot('library-favorites');
   await press(page, 'Escape', 3);
   await page.waitForSelector('.home:not(.is-behind)');
+  results.recentRow = await page.$$eval('.recent-card', (n) => n.length);
+  await shot('home-with-recent');
   await press(page, 'y');
   await page.waitForSelector('.search-input');
   await page.keyboard.type('mario');

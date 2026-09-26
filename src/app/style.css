@@ -79,8 +79,11 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 /* ---------- Home ---------- */
 .topbar { display: flex; align-items: center; height: 3rem; }
 .wordmark { font-size: 2rem; font-weight: 700; letter-spacing: 0.02em; }
-.home-info { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 2.5rem; max-width: 60rem; }
-.home-title { margin: 0; font-size: 5.5rem; line-height: 1.05; font-weight: 700; letter-spacing: -0.01em; text-shadow: 0 2px 24px rgb(0 0 0 / 0.5); }
+.home-info { flex: 1; min-height: 9rem; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 2rem; max-width: 90rem; }
+/* With a second row the hero text gets less room; keep it clear of the top bar. */
+.home:has(.shelf-recent) .home-title { font-size: 3.75rem; }
+.home-title { margin: 0; font-size: 4.5rem; line-height: 1.1; font-weight: 700; letter-spacing: -0.01em; text-shadow: 0 2px 24px rgb(0 0 0 / 0.5);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .home-detail { margin: 1rem 0 0; font-size: 1.875rem; color: var(--on-surface-variant); }
 
 .shelf { margin-top: 0.5rem; }
@@ -109,8 +112,8 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .system-card.is-focused { transform: scale(1.06); transform-origin: 50% 70%; }
 .system-card.is-focused .fan { box-shadow: 0 0 0 0.25rem var(--focus), 0 16px 40px rgb(0 0 0 / 0.6); }
 
-.recent-card { flex: 0 0 9.5rem; display: flex; flex-direction: column; text-align: left; transition: transform 200ms var(--ease); }
-.recent-cover { width: 9.5rem; height: 12.5rem; object-fit: cover; border-radius: var(--radius-s); background: var(--surface-container); }
+.recent-card { flex: 0 0 8.5rem; display: flex; flex-direction: column; text-align: left; transition: transform 200ms var(--ease); }
+.recent-cover { width: 8.5rem; height: 11rem; object-fit: cover; border-radius: var(--radius-s); background: var(--surface-container); }
 .recent-title { margin-top: 0.625rem; font-size: 1.125rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .recent-system { font-size: 1rem; color: var(--on-surface-variant); }
 .recent-card.is-focused { transform: scale(1.08); transform-origin: 50% 40%; }
