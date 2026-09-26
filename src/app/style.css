@@ -220,6 +220,9 @@ div.detail-cover { width: 26rem; height: 36rem; position: relative; }
 .search-input.is-focused { box-shadow: 0 0 0 0.25rem var(--focus); }
 .search-summary { margin: 1.5rem 0 0.5rem; font-size: 1.5rem; color: var(--on-surface-variant); }
 .grid-search { --tile-w: 13.25rem; --tile-aspect: 0.75; }
+/* Search mixes box shapes; show whole covers instead of cropping them. */
+.grid-search .tile-cover { object-fit: contain; object-position: center bottom; }
+.grid-search .tile { background: rgb(var(--scrim) / 0.6); }
 
 .problem { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; gap: 1rem; }
 .problem h1 { margin: 0; font-size: 4rem; }

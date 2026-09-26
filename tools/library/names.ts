@@ -26,7 +26,9 @@ const REGION_CODES: Record<string, Region> = {
 };
 
 const NON_RETAIL = /\b(pd|homebrew|demo|beta|proto|prototype|sample|test|program|utility|hack)\b/i;
-const FLAWED_BRACKET = /^(b\d*|h\w*|o\d*|t\d*|p\d*|f\d*|a\d*|bf|x)$/i;
+const FLAWED_BRACKET = /^(b\d*|h\w*|o\d*|t\d*|f\d*|a\d*|bf|x)$/i;
+/** Pirate multicarts and bootlegs ([p], [p1]); "[!p]" means pending verification and is fine. */
+const PIRATE_BRACKET = /^p\d*$/i;
 
 export function stripTags(name: string): string {
   return name
@@ -61,7 +63,7 @@ export function parseName(file: string): ParsedName {
     region: regionOf(paren),
     verified: bracket.includes('!'),
     flawed: bracket.some((b) => FLAWED_BRACKET.test(b)),
-    nonRetail: paren.some((p) => NON_RETAIL.test(p)),
+    nonRetail: paren.some((p) => NON_RETAIL.test(p)) || bracket.some((b) => PIRATE_BRACKET.test(b)),
     translated: bracket.some((b) => /^T[+-]/i.test(b)),
   };
 }

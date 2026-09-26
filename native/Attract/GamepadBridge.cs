@@ -80,12 +80,12 @@ namespace Attract
             lastSentAt = now;
 
             var message = new JsonObject { ["type"] = JsonValue.CreateStringValue("gamepad") };
-            var b = new JsonArray();
-            foreach (var value in buttons) b.Add(JsonValue.CreateBooleanValue(value));
-            var a = new JsonArray();
-            foreach (var value in axes) a.Add(JsonValue.CreateNumberValue(value));
-            message["buttons"] = b;
-            message["axes"] = a;
+            var buttonValues = new JsonArray();
+            foreach (var value in buttons) buttonValues.Add(JsonValue.CreateBooleanValue(value));
+            var axisValues = new JsonArray();
+            foreach (var value in axes) axisValues.Add(JsonValue.CreateNumberValue(value));
+            message["buttons"] = buttonValues;
+            message["axes"] = axisValues;
             message["sequence"] = JsonValue.CreateNumberValue(++sequence);
             return message;
         }

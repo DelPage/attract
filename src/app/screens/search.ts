@@ -30,10 +30,11 @@ export class SearchScreen implements Screen {
       this.results = [];
       this.summary.textContent = `Type a name to search ${gameCount(this.library.games.length)}.`;
     } else {
-      const starts = this.keys.filter((k) => k.key.startsWith(query));
-      const contains = this.keys.filter((k) => !k.key.startsWith(query) && k.key.includes(query));
-      this.results = [...starts, ...contains].slice(0, MAX_RESULTS).map((k) => k.game);
-      const total = starts.length + contains.length;
+      // Best-known games first, so "mario" leads with the Mario games people look for.
+      const matches = this.keys.filter((k) => k.key.includes(query))
+        .sort((a, b) => (b.game.fame ?? 0) - (a.game.fame ?? 0) || Number(b.key.startsWith(query)) - Number(a.key.startsWith(query)) || a.game.sortTitle.localeCompare(b.game.sortTitle));
+      this.results = matches.slice(0, MAX_RESULTS).map((k) => k.game);
+      const total = matches.length;
       this.summary.textContent = total ? (total > MAX_RESULTS ? `Showing ${MAX_RESULTS} of ${gameCount(total)}` : gameCount(total)) : 'No games match that name.';
     }
     const shortName = new Map(this.library.systems.map((s) => [s.id, s.shortName]));
