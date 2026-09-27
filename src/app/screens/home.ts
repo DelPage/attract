@@ -6,13 +6,14 @@ import { clamp, h, img, type Command, type Screen } from '../ui';
 
 export { showcase } from '../showcase';
 
-const ATTRACT_INTERVAL_MS = 6000;
+const ATTRACT_INTERVAL_MS = 5500;
 /** Focused card height in rem; everything in the deck scales from it. */
-const CARD_HEIGHT = 30;
-const SYSTEM_ASPECT = 1.6;
+const CARD_HEIGHT = 34;
+/** Tall poster cards for systems. */
+const POSTER_ASPECT = 0.7;
 const COVER_ASPECT = 0.72;
 /** Each card further back is this much smaller than the one in front of it. */
-const RECEDE = 0.74;
+const RECEDE = 0.8;
 const GAP = 1.75;
 const VISIBLE_BEHIND = 6;
 
@@ -61,25 +62,41 @@ export class HomeScreen implements Screen {
     this.channelIndex = Math.max(0, channels.findIndex((c) => c.id === currentId));
   }
 
-  /** A card plus its floor reflection. The reflection mirrors only the picture, never the name plate. */
-  private card(key: string, src: string | undefined, title: string, sub: string, aspect: number, extra: string): HTMLElement {
-    const art = img(src, 'nxe-art', title);
-    const mirror = img(src, 'nxe-mirror-art');
+  /** A card plus its floor reflection. The reflection mirrors only the picture, never the text. */
+  private slot(key: string, aspect: number, extra: string, face: HTMLElement, mirror?: HTMLElement): HTMLElement {
     return h('button', { class: `nxe-slot ${extra}`, attrs: { 'data-key': key, style: `--aspect:${aspect}` } },
-      h('span', { class: 'nxe-card' },
-        art ?? h('span', { class: 'nxe-card-empty', text: title }),
-        h('span', { class: 'nxe-gloss' }),
-        h('span', { class: 'nxe-band' }, h('span', { class: 'nxe-title', text: title }), h('span', { class: 'nxe-sub', text: sub }))),
+      h('span', { class: 'nxe-card' }, face, h('span', { class: 'nxe-gloss' })),
       mirror ? h('span', { class: 'nxe-mirror', attrs: { 'aria-hidden': 'true' } }, mirror) : undefined);
   }
 
+  /** Poster card: the system's brand colors, its logo, and the console standing at the bottom. */
   private systemCard(system: CatalogSystem): Card {
-    return { el: this.card(system.id, mediaUrl(system.image), system.name, `${system.maker} · ${system.year} · ${gameCount(system.gameCount)}`, SYSTEM_ASPECT, 'is-system'), aspect: SYSTEM_ASPECT, system };
+    const [top, bottom] = system.brand ?? ['#36343b', '#141218'];
+    const colors = `--brand-top:${top};--brand-bottom:${bottom}`;
+    const logo = img(mediaUrl(system.logo), `poster-logo${system.logoInColor ? ' is-color' : ''}`, system.name)
+      ?? h('span', { class: 'poster-wordmark', text: system.name });
+    const face = h('span', { class: 'poster', attrs: { style: colors } },
+      h('span', { class: 'poster-light' }),
+      h('span', { class: 'poster-head' }, logo),
+      h('span', { class: 'poster-floor' }),
+      img(mediaUrl(system.console), `poster-console poster-console-${system.id}`, '') ?? h('span'),
+      h('span', { class: 'poster-foot' },
+        h('span', { class: 'poster-count', text: gameCount(system.gameCount) }),
+        h('span', { class: 'poster-meta', text: `${system.maker} · ${system.year}` })));
+    const mirror = h('span', { class: 'poster poster-mirror', attrs: { style: colors } },
+      img(mediaUrl(system.console), `poster-console poster-console-${system.id}`, '') ?? h('span'));
+    return { el: this.slot(system.id, POSTER_ASPECT, 'is-system', face, mirror), aspect: POSTER_ASPECT, system };
   }
 
   private gameCard(game: CatalogGame): Card {
     const system = this.library.systems.find((s) => s.id === game.system);
-    return { el: this.card(game.id, mediaUrl(game.art.cover), game.title, [system?.shortName, game.year].filter(Boolean).join(' · '), COVER_ASPECT, 'is-game'), aspect: COVER_ASPECT, game };
+    const src = mediaUrl(game.art.cover);
+    const face = h('span', { class: 'cover-face' },
+      img(src, 'nxe-art', game.title) ?? h('span', { class: 'nxe-card-empty', text: game.title }),
+      h('span', { class: 'nxe-band' }, h('span', { class: 'nxe-title', text: game.title }),
+        h('span', { class: 'nxe-sub', text: [system?.shortName, game.year].filter(Boolean).join(' · ') })));
+    const mirror = img(src, 'nxe-mirror-art');
+    return { el: this.slot(game.id, COVER_ASPECT, 'is-game', face, mirror), aspect: COVER_ASPECT, game };
   }
 
   private get channel(): Channel { return this.channels[this.channelIndex]; }
@@ -95,12 +112,14 @@ export class HomeScreen implements Screen {
       if (k < 0) {
         style.transform = `translate3d(${-(width + 8)}rem, 2rem, 0) scale(0.9)`;
         style.opacity = '0';
+        style.filter = '';
         style.zIndex = '0';
       } else {
         const scale = RECEDE ** k;
         const y = CARD_HEIGHT * (1 - scale) * 0.32;
         style.transform = `translate3d(${x}rem, ${y}rem, 0) rotateY(${k === 0 ? 0 : -9}deg) scale(${scale})`;
-        style.opacity = k > VISIBLE_BEHIND ? '0' : String(1 - k * 0.1);
+        style.opacity = k > VISIBLE_BEHIND ? '0' : '1';
+        style.filter = k === 0 ? '' : `brightness(${(1 - k * 0.13).toFixed(2)})`;
         style.zIndex = String(100 - k);
         x += (width + GAP) * scale;
       }
@@ -125,19 +144,25 @@ export class HomeScreen implements Screen {
     const card = this.channel.cards[this.channel.index];
     if (card?.system) {
       const games = this.library.bySystem.get(card.system.id) ?? [];
-      this.startAttract(showcase(games, `${card.system.id}-screens`, 12, 'screen').map((g) => mediaUrl(g.art.screen)!));
+      this.startAttract(showcase(games, `${card.system.id}-screens`, 12, 'screen'), card.system.smoothArt ? 'smooth' : 'pixel');
     } else if (card?.game) {
-      this.startAttract([mediaUrl(card.game.art.screen) ?? mediaUrl(card.game.art.title)].filter((x): x is string => !!x));
+      const system = this.library.systems.find((s) => s.id === card.game!.system);
+      this.startAttract([card.game], system?.smoothArt ? 'smooth' : 'pixel');
     }
   }
 
-  /** Cycle real screenshots from the focused system behind the cards. */
-  private startAttract(frames: string[]): void {
+  /** Full-screen gameplay from the focused system's best known games, changing every few seconds. */
+  private startAttract(games: CatalogGame[], look: 'pixel' | 'smooth'): void {
     window.clearInterval(this.attractTimer);
+    const frames = games.filter((g) => g.art.screen || g.art.title);
+    const show = (g: CatalogGame | undefined) => {
+      this.shell.setBackdrop(mediaUrl(g?.art.screen ?? g?.art.title), look);
+      this.shell.setCaption(g ? [g.title, g.year].filter(Boolean).join(' · ') : '');
+    };
     let i = 0;
-    this.shell.setBackdrop(frames[0]);
+    show(frames[0]);
     if (frames.length < 2) return;
-    this.attractTimer = window.setInterval(() => { i = (i + 1) % frames.length; this.shell.setBackdrop(frames[i]); }, ATTRACT_INTERVAL_MS);
+    this.attractTimer = window.setInterval(() => { i = (i + 1) % frames.length; show(frames[i]); }, ATTRACT_INTERVAL_MS);
   }
 
   handle(command: Command): boolean {
@@ -166,7 +191,7 @@ export class HomeScreen implements Screen {
   }
 
   onShow(): void { this.buildChannels(); this.renderChannel(0); }
-  onHide(): void { window.clearInterval(this.attractTimer); }
+  onHide(): void { window.clearInterval(this.attractTimer); this.shell.setCaption(''); }
 
   hints(): [string, string][] {
     return this.channels.length > 1 ? [['↕', 'Switch row'], ['Y', 'Search'], ['A', 'Open']] : [['Y', 'Search'], ['A', 'Open']];

@@ -7,8 +7,15 @@ export interface CatalogSystem {
   maker: string;
   year: number;
   gameCount: number;
-  /** Console photo for the home screen card, relative to the library. */
-  image?: string;
+  /** Home screen card art, relative to the library: cut-out console and logo. */
+  console?: string;
+  logo?: string;
+  /** The logo keeps its own colors (it is built on filled shapes). */
+  logoInColor?: boolean;
+  /** Brand colors for the card, top and bottom. */
+  brand?: [string, string];
+  /** 3D-era systems look better smoothly scaled than as hard pixels. */
+  smoothArt?: boolean;
 }
 
 export interface CatalogVersion { label: string; path: string }

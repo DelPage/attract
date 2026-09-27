@@ -5,13 +5,16 @@
  *   npx tsx tools/library/build-catalog.ts
  */
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import type { Catalog, CatalogGame, CatalogSystem } from './catalog';
 import { matchKey, parseName, stripTags, versionScore } from './names';
 import { CONSOLE_ROMS, Portal, type PortalFile } from './portal';
+import { SYSTEM_ART } from './consoles';
 import { SYSTEMS, type SystemDef } from './systems';
-import { ART_KINDS, arcadeMeta, loadArcadeNames, loadArt, loadMeta, type ArtKind, type ArtSet, type GameMeta } from './sources';
+
+const SMOOTH_ART = new Set(['n64', 'psx']);
+import { ART_KINDS, CACHE, arcadeMeta, loadArcadeNames, loadArt, loadMeta, type ArtKind, type ArtSet, type GameMeta } from './sources';
 
 interface Dump { file: PortalFile; title: string; sourceName: string; score: number; extra: boolean; meta?: GameMeta }
 
@@ -76,8 +79,23 @@ function versionLabel(d: Dump): string {
   return tags || d.file.name;
 }
 
+/** Console folder listing, saved after every successful read so the catalog can be rebuilt while the console is off. */
+async function listing(portal: Portal, system: SystemDef): Promise<PortalFile[]> {
+  const saved = path.join(CACHE, 'listings', `${system.id}.json`);
+  try {
+    const files = await portal.systemFiles(system.folder, system.id === 'psx' ? 3 : 0);
+    mkdirSync(path.dirname(saved), { recursive: true });
+    writeFileSync(saved, JSON.stringify(files));
+    return files;
+  } catch (error) {
+    if (!existsSync(saved)) throw error;
+    console.warn(`${system.shortName}: console unreachable, using the saved game list.`);
+    return JSON.parse(readFileSync(saved, 'utf8')) as PortalFile[];
+  }
+}
+
 async function buildSystem(portal: Portal, system: SystemDef): Promise<CatalogGame[]> {
-  const files = playableFiles(system, await portal.systemFiles(system.folder, system.id === 'psx' ? 3 : 0));
+  const files = playableFiles(system, await listing(portal, system));
   const art = [system.libretro, ...(system.libretroFallbacks ?? [])].map(loadArt);
   const meta = loadMeta(system);
   const groups = new Map<string, Dump[]>();
@@ -113,9 +131,12 @@ async function main(): Promise<void> {
     if (!list.length) continue;
     games.push(...list);
     const shown = list.filter((g) => !g.extra);
-    const image = `media/systems/${system.id}.webp`;
-    systems.push({ id: system.id, name: system.name, shortName: system.shortName, maker: system.maker, year: system.year, gameCount: shown.length,
-      ...(existsSync(path.join(OUT, image)) ? { image } : {}) });
+    const art = (file: string) => (existsSync(path.join(OUT, file)) ? file : undefined);
+    systems.push({
+      id: system.id, name: system.name, shortName: system.shortName, maker: system.maker, year: system.year, gameCount: shown.length,
+      console: art(`media/systems/${system.id}-console.webp`), logo: art(`media/systems/${system.id}-logo.png`),
+      logoInColor: SYSTEM_ART[system.id]?.logoInColor, brand: system.brand, smoothArt: SMOOTH_ART.has(system.id),
+    });
     const pct = (n: number) => `${Math.round((100 * n) / Math.max(1, shown.length))}%`;
     console.log(`${system.shortName.padEnd(14)} ${String(shown.length).padStart(5)} games (+${list.length - shown.length} extras)  cover ${pct(shown.filter((g) => g.artSource.cover).length)}  screen ${pct(shown.filter((g) => g.artSource.screen).length)}  year ${pct(shown.filter((g) => g.year).length)}  genre ${pct(shown.filter((g) => g.genre).length)}  about ${pct(shown.filter((g) => g.description).length)}`);
   }

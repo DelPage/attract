@@ -12,10 +12,13 @@ export class Shell {
   private readonly stage = h('main', { class: 'stage' });
   private readonly footer = h('footer', { class: 'hints' });
   private readonly clock = h('div', { class: 'clock' });
+  private readonly caption = h('div', { class: 'backdrop-caption' });
+  private readonly backdrop: HTMLElement;
 
   constructor(root: HTMLElement) {
     this.layers = [h('img', { class: 'backdrop-art', attrs: { alt: '' } }), h('img', { class: 'backdrop-art', attrs: { alt: '' } })];
-    root.append(h('div', { class: 'backdrop' }, ...this.layers, h('div', { class: 'backdrop-shade' })), this.stage, this.clock, this.footer);
+    this.backdrop = h('div', { class: 'backdrop' }, ...this.layers, h('div', { class: 'backdrop-scanlines' }), h('div', { class: 'backdrop-shade' }));
+    root.append(this.backdrop, this.stage, this.clock, this.caption, this.footer);
     this.tick();
     window.setInterval(() => this.tick(), 15_000);
   }
@@ -64,8 +67,15 @@ export class Shell {
     this.stage.parentElement?.append(h('div', { class: 'notice', text }));
   }
 
-  /** Crossfade the full-screen art. Missing art falls back to the plain surface. */
-  setBackdrop(src: string | undefined): void {
+  /** Small line naming the game shown behind the home screen. */
+  setCaption(text: string): void { this.caption.textContent = text; }
+
+  /**
+   * Crossfade the full-screen art. "soft" is a blurred color wash for busy
+   * screens; "pixel" and "smooth" show gameplay sharp, the way the console drew it.
+   */
+  setBackdrop(src: string | undefined, look: 'soft' | 'pixel' | 'smooth' = 'soft'): void {
+    this.backdrop.dataset.look = look;
     const next = src ?? '';
     if (next === this.backdropSrc) return;
     this.backdropSrc = next;

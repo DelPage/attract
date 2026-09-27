@@ -50,6 +50,22 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 }
 /* Slight overscale hides the black borders many console screenshots carry. */
 .backdrop-art.is-on { opacity: 1; transform: scale(1.1); }
+/* Sharp gameplay behind the home screen: hard pixels (or smooth for 3D systems), CRT lines, slow drift. */
+.backdrop[data-look='pixel'] .backdrop-art, .backdrop[data-look='smooth'] .backdrop-art { filter: saturate(1.1); transform: scale(1.02); transition: opacity 1100ms var(--ease), transform 9s linear; }
+.backdrop[data-look='pixel'] .backdrop-art { image-rendering: pixelated; }
+.backdrop[data-look='pixel'] .backdrop-art.is-on, .backdrop[data-look='smooth'] .backdrop-art.is-on { transform: scale(1.09); }
+.backdrop-scanlines { position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity 600ms var(--ease);
+  background: repeating-linear-gradient(180deg, rgb(0 0 0 / 0.28) 0 2px, transparent 2px 5px); }
+.backdrop[data-look='pixel'] .backdrop-scanlines, .backdrop[data-look='smooth'] .backdrop-scanlines { opacity: 1; }
+.backdrop[data-look='pixel'] .backdrop-shade, .backdrop[data-look='smooth'] .backdrop-shade {
+  background:
+    radial-gradient(120% 100% at 72% 35%, transparent 30%, rgb(var(--scrim) / 0.85) 100%),
+    linear-gradient(90deg, rgb(var(--scrim) / 0.8) 0%, rgb(var(--scrim) / 0.45) 50%, rgb(var(--scrim) / 0.15) 80%),
+    linear-gradient(0deg, rgb(var(--scrim) / 0.92) 0%, rgb(var(--scrim) / 0.3) 35%, transparent 55%),
+    rgb(var(--scrim) / 0.18);
+}
+.backdrop-caption { position: absolute; top: calc(var(--safe-y) + 3.25rem); right: var(--safe-x); font-size: 1.25rem; font-weight: 500;
+  color: rgb(255 255 255 / 0.8); text-shadow: 0 1px 8px rgb(0 0 0 / 0.9); }
 .backdrop-shade {
   position: absolute; inset: 0;
   background:

@@ -18,7 +18,7 @@ export class Portal {
 
   private async list(path: string): Promise<PortalItem[]> {
     const url = `${this.base}/api/filesystem/apps/files?knownfolderid=DevelopmentFiles&path=${encodeURIComponent(path)}`;
-    const response = await fetch(url, { signal: AbortSignal.timeout(30_000), dispatcher: portalAgent });
+    const response = await fetch(url, { signal: AbortSignal.timeout(8_000), dispatcher: portalAgent });
     if (!response.ok) throw new Error(`Device Portal listing failed for ${path}: HTTP ${response.status}`);
     const body = (await response.json()) as { Items?: PortalItem[] };
     return body.Items ?? [];

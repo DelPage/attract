@@ -49,9 +49,9 @@ const press = async (page, key, times = 1) => { for (let i = 0; i < times; i++) 
 
 await session(1920, 1080, '1080p', async (page, shot) => {
   await shot('home');
-  results.systems = await page.$$eval('.nxe-slot.is-system', (n) => n.map((x) => x.querySelector('.nxe-title').textContent));
+  results.systems = await page.$$eval('.nxe-slot.is-system', (n) => n.map((x) => x.dataset.key));
   await press(page, 'ArrowRight');
-  const home = await page.$eval('.nxe-slot.is-focused .nxe-title', (n) => n.textContent);
+  const home = await page.$eval('.nxe-slot.is-focused', (n) => n.dataset.key);
   results.homeSecond = home;
   await shot('home-snes');
   await press(page, 'Enter');
